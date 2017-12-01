@@ -25,7 +25,17 @@ inquirer.prompt([
     
     switch(command){
         case "Tweets":
-            tweets();
+            inquirer.prompt([
+                {
+                    type: "input",
+                    message: "Search tweets by Twitter user name or hit enter to see my tweets:",
+                    name: "searchValue"
+                }
+            ])
+            .then(function(inquirerResponse){
+                var searchValue = inquirerResponse.searchValue;
+                tweets(searchValue);
+            });
             break;
         case "Music":
             inquirer.prompt([
@@ -59,7 +69,7 @@ inquirer.prompt([
     }
 });
 
-function tweets(){
+function tweets(searchValue){
     var client = new twitter({
 		consumer_key: twitterKeys.consumer_key,
 		consumer_secret: twitterKeys.consumer_secret,
@@ -67,7 +77,7 @@ function tweets(){
 		access_token_secret: twitterKeys.access_token_secret,
     });
     
-    var params = {screen_name: "austenclyde", count: "20", trim_user: false,}
+    var params = {screen_name: searchValue, count: "20", trim_user: false,}
 
     client.get('statuses/user_timeline', params, function(error, timeline, response){
 		if(!error){
@@ -108,14 +118,6 @@ function spotifySearch(searchValue){
 
 function movieSearch(searchValue){
    
-    for (var i = 3; i < nodeArgs.length; i++){
-        if (i > 2 && i < nodeArgs.length){
-            searchValue = searchValue + "+" + nodeArgs[i];
-        }else{
-            searchValue += nodeArgs[i];
-        }
-    } 
-
     var queryURL = "http://www.omdbapi.com/?t=" + searchValue + "&y=&plot=full&apikey=trilogy"
     console.log(queryURL);
 
@@ -127,7 +129,11 @@ function movieSearch(searchValue){
             console.log("Title: " + source.Title);
             console.log("Release Date: " + source.Released);
             console.log("IMDB Rating: "  + source.imdbRating);
-            console.log("Rotten Tomatoes Rating: " + source.Ratings[1].Value);
+            if (source.Ratings.length > 1){
+                console.log("Rotten Tomatoes Rating: " + source.Ratings[1].Value);
+            }else{
+                console.log("Rotten Tomatoes Rating: null")
+            };
             console.log("Produced in " + source.Country);
             console.log("Language: " + source.Language);
             console.log("Plot: " + source.Plot);
@@ -145,26 +151,8 @@ function doIt(){
             return console.log(error);
         }else{
             var searchValue = data;
-            var spotify = new Spotify({
-                id: spotifyKeys.client_id,
-                secret: spotifyKeys.client_secret
-            });
+            spotifySearch(searchValue);
             
-            spotify.search({type: 'track', query: searchValue, count: "20"}, function(err, data) {
-                if (err) throw err;
-                var music = data.tracks.items;
-                for (var i = 0; i<music.length; i++){
-                    for (j=0; j<music[i].artists.length; j++){                   
-                        console.log("------------------------------------");
-                        console.log("Artist: " + music[i].artists[j].name);
-                        console.log("Song Name: " + music[i].name);
-                        console.log("Preview Link of the song from Spotify: " + music[i].preview_url);
-                        console.log("Album Name: " + music[i].album.name);
-                        console.log("------------------------------------");
-                        console.log("");
-                    }
-                }
-            })
         }
 	});
 };
