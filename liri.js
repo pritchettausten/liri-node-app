@@ -1,3 +1,4 @@
+//ALL THE DEPENDENCIES OF THE JAVASCRIPT
 var fs = require("fs");
 var keys = require("./keys.js");
 var twitter = require('twitter');
@@ -8,9 +9,9 @@ var inquirer = require("inquirer");
 var spotifyKeys = keys.spotifyKeys;
 var twitterKeys = keys.twitterKeys;
 
-var nodeArgs = process.argv;
 var searchValue = "";
 
+//FIRST PROMPT DECIDES WHICH FUNCTION WILL BE USED
 inquirer.prompt([
     {
         type: "list",
@@ -22,9 +23,12 @@ inquirer.prompt([
 .then(function(inquirerResponse){
     
     var command = inquirerResponse.command;
-    
+
+//SWITCH STATEMENT TO EASILY EXECUTE WHICHEVER COMMAND WAS SELECTED
     switch(command){
         case "Tweets":
+
+ //SECOND PROMPT AFTER SELECTING TWEETS TO ENTER IN USERNAME TO SEARCH FOR 
             inquirer.prompt([
                 {
                     type: "input",
@@ -37,6 +41,8 @@ inquirer.prompt([
                 tweets(searchValue);
             });
             break;
+
+//SECOND PROMPT TO SEARCH FOR SPECIFIC SONG    
         case "Music":
             inquirer.prompt([
                 {
@@ -50,6 +56,8 @@ inquirer.prompt([
                 spotifySearch(searchValue);
             });
             break;
+
+//SECOND PROMPT TO SEARCH FOR SPECIFIC MOVIE    
         case "Movies":
             inquirer.prompt([
                 {
@@ -69,14 +77,18 @@ inquirer.prompt([
     }
 });
 
+// FUNCTION TO RETURN THE TWEETS OF WHOMEVER THE USER SEARCHES FOR
 function tweets(searchValue){
+
+//USES THE KEYS FROM THE KEYS.JS FILE
     var client = new twitter({
 		consumer_key: twitterKeys.consumer_key,
 		consumer_secret: twitterKeys.consumer_secret,
 		access_token_key: twitterKeys.access_token_key,
 		access_token_secret: twitterKeys.access_token_secret,
     });
-    
+
+//USES THE USER 'SEARCHVALUE' IN THE PARAMS TO SEARCH FOR ANY TWITTER ACCOUNT
     var params = {screen_name: searchValue, count: "20", trim_user: false,}
 
     client.get('statuses/user_timeline', params, function(error, timeline, response){
@@ -93,11 +105,12 @@ function tweets(searchValue){
     })
 }
 
+//SEARCHES FOR SONGS ON SPOTIFY THAT CONTAIN THE SAME WORDS AS THE SEARCH VALUE
 function spotifySearch(searchValue){
     var spotify = new Spotify({
         id: spotifyKeys.client_id,
         secret: spotifyKeys.client_secret
-      });
+    });
 
     spotify.search({type: 'track', query: searchValue, count: "20"}, function(err, data) {
 	    if (err) throw err;
@@ -116,6 +129,7 @@ function spotifySearch(searchValue){
 	});
 };
 
+//SEARCHES THE OMDB API FOR MOVIES AND RETURNS INFORMATION ON THE BEST MATCH
 function movieSearch(searchValue){
    
     var queryURL = "http://www.omdbapi.com/?t=" + searchValue + "&y=&plot=full&apikey=trilogy"
@@ -145,6 +159,7 @@ function movieSearch(searchValue){
     })
 };
 
+//READS THE TXT FILE AND USES THE DATA AS THE SEARCH VALUE FOR THE SPOTIFY SEARCH FUNTION
 function doIt(){
     fs.readFile("random.txt", "UTF-8", function(error, data){
         if(error){

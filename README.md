@@ -1,0 +1,5 @@
+-Gives the user the choices to search for someones tweets, search for movie information, search for songs, or get a random response
+-Twitter search allows user to input user name which is added to the twitter request or it just defaults to mine because it uses my keys.
+-Spotify music search returns a list of results containing the term/ song the user searched for
+-Movie search returns info on the movie that the user searched for
+-Random will real the random.txt file and input that information into the Spotify function to return a search for "I Want it That Way"
